@@ -32,7 +32,7 @@ Para executar este chatbot, siga os passos abaixo:
 
     - Para anexar uma imagem, clique no botão "Anexar Imagem", selecione um arquivo de imagem do seu computador e, em seguida, clique em "Enviar" (com ou sem texto adicional).
 
-Você pode limpar a imagem selecionada clicando no botão "Limpar Imagem" ao lado da pré-visualização da imagem.
+    - Você pode limpar a imagem selecionada clicando no botão "Limpar Imagem" ao lado da pré-visualização da imagem.
 
 ## Detalhes Técnicos
 - HTML: Estrutura básica da página e dos elementos do chatbot.
