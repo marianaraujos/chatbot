@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini AI Chatbot</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .chat-container {
+            width: 100%;
+            max-width: 600px;
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            background-color: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .chat-header {
+            background-color: #4f46e5;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            border-top-left-radius: 1rem;
+            border-top-right-radius: 1rem;
+        }
+        .chat-messages {
+            flex-grow: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            background-color: #f9fafb;
+        }
+        .message-bubble {
+            max-width: 80%;
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            word-wrap: break-word;
+        }
+        .message-bubble.user {
+            background-color: #e0e7ff;
+            align-self: flex-end;
+            color: #374151;
+        }
+        .message-bubble.ai {
+            background-color: #d1fae5;
+            align-self: flex-start;
+            color: #10b981;
+        }
+        .message-bubble img {
+            max-width: 100%;
+            border-radius: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .chat-input-area {
+            display: flex;
+            flex-direction: column; /* Changed to column to stack input and image preview */
+            padding: 1rem;
+            border-top: 1px solid #e5e7eb;
+            background-color: #ffffff;
+            border-bottom-left-radius: 1rem;
+            border-bottom-right-radius: 1rem;
+        }
+        .input-controls {
+            display: flex;
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+        .chat-input {
+            flex-grow: 1;
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .chat-input:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+        .send-button {
+            background-color: #4f46e5;
+            color: white;
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.75rem;
+            margin-left: 0.75rem;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .send-button:hover {
+            background-color: #4338ca;
+            transform: translateY(-1px);
+        }
+        .send-button:active {
+            background-color: #3730a3;
+            transform: translateY(0);
+        }
+        .loading-indicator {
+            display: none; /* Hidden by default */
+            align-self: flex-start;
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            background-color: #e0e7ff; /* Lighter blue for loading */
+            color: #4f46e5;
+            font-style: italic;
+        }
+        .loading-indicator.active {
+            display: block;
+        }
+        .image-upload-button {
+            background-color: #6b7280;
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            margin-right: 0.75rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        .image-upload-button:hover {
+            background-color: #4b5563;
+        }
+        .image-preview-container {
+            display: none; /* Hidden by default */
+            margin-top: 1rem;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.75rem;
+            background-color: #f3f4f6;
+            position: relative;
+        }
+        .image-preview-container.active {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .image-preview {
+            max-width: 100px;
+            max-height: 100px;
+            border-radius: 0.5rem;
+            object-fit: cover;
+            margin-right: 1rem;
+        }
+        .clear-image-button {
+            background-color: #ef4444;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background-color 0.2s;
+        }
+        .clear-image-button:hover {
+            background-color: #dc2626;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .chat-container {
+                height: 95vh;
+                width: 95%;
+                border-radius: 0.5rem;
+            }
+            .chat-header {
+                font-size: 1.25rem;
+                padding: 0.75rem;
+                border-top-left-radius: 0.5rem;
+                border-top-right-radius: 0.5rem;
+            }
+            .chat-messages {
+                padding: 1rem;
+                gap: 0.75rem;
+            }
+            .chat-input-area {
+                padding: 0.75rem;
+            }
+            .chat-input, .send-button, .image-upload-button {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+            .image-preview-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .image-preview {
+                margin-bottom: 0.5rem;
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            Chatbot IA
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <!-- Chat messages will be appended here -->
+            <div class="message-bubble ai">Olá! Como posso lhe ajudar?</div>
+        </div>
+        <div class="chat-input-area">
+            <div id="imagePreviewContainer" class="image-preview-container">
+                <img id="imagePreview" class="image-preview" src="#" alt="Image Preview">
+                <button id="clearImageButton" class="clear-image-button">Clear Image</button>
+            </div>
+            <div class="input-controls">
+                <input type="file" id="imageInput" accept="image/*" class="hidden">
+                <button id="attachImageButton" class="image-upload-button">Anexar Imagem</button>
+                <input type="text" id="chatInput" class="chat-input" placeholder="Digite sua mensagem...">
+                <button id="sendButton" class="send-button">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chatInput = document.getElementById('chatInput');
+        const sendButton = document.getElementById('sendButton');
+        const chatMessages = document.getElementById('chatMessages');
+        const imageInput = document.getElementById('imageInput');
+        const attachImageButton = document.getElementById('attachImageButton');
+        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+        const imagePreview = document.getElementById('imagePreview');
+        const clearImageButton = document.getElementById('clearImageButton');
+
+        // Initialize chat history for the API
+        let chatHistory = [];
+        let selectedImageBase64 = null;
+        let selectedImageMimeType = null;
+
+        // Function to add a message to the chat display
+        function addMessage(text, sender, imageUrl = null) {
+            const messageBubble = document.createElement('div');
+            messageBubble.classList.add('message-bubble', sender);
+
+            if (imageUrl) {
+                const imgElement = document.createElement('img');
+                imgElement.src = imageUrl;
+                imgElement.classList.add('message-image'); // Add a class for styling if needed
+                messageBubble.appendChild(imgElement);
+            }
+
+            const textNode = document.createTextNode(text);
+            messageBubble.appendChild(textNode);
+            chatMessages.appendChild(messageBubble);
+            // Scroll to the bottom of the chat
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Function to show/hide loading indicator
+        function showLoading(show) {
+            let loadingIndicator = document.getElementById('loadingIndicator');
+            if (show) {
+                if (!loadingIndicator) {
+                    loadingIndicator = document.createElement('div');
+                    loadingIndicator.id = 'loadingIndicator';
+                    loadingIndicator.classList.add('loading-indicator', 'active');
+                    loadingIndicator.textContent = 'Chatbot está digitando...';
+                    chatMessages.appendChild(loadingIndicator);
+                } else {
+                    loadingIndicator.classList.add('active');
+                }
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            } else {
+                if (loadingIndicator) {
+                    loadingIndicator.classList.remove('active');
+                    // No need to remove it, just hide it for potential reuse
+                }
+            }
+        }
+
+        // Function to send message to Gemini API
+        async function sendMessage() {
+            const message = chatInput.value.trim();
+
+            if (!message && !selectedImageBase64) return; // Don't send empty messages or no image
+
+            // Prepare parts for the message
+            const parts = [];
+            if (message) {
+                parts.push({ text: message });
+            }
+            if (selectedImageBase64) {
+                parts.push({
+                    inlineData: {
+                        mimeType: selectedImageMimeType,
+                        data: selectedImageBase64
+                    }
+                });
+            }
+
+            // Display user message with image if present
+            addMessage(message, 'user', selectedImageBase64 ? `data:${selectedImageMimeType};base64,${selectedImageBase64}` : null);
+
+            chatHistory.push({ role: "user", parts: parts });
+            chatInput.value = ''; // Clear input
+            clearSelectedImage(); // Clear selected image after sending
+
+            showLoading(true); // Show loading indicator
+            sendButton.disabled = true; // Disable send button
+            attachImageButton.disabled = true; // Disable attach button
+
+            try {
+                const payload = { contents: chatHistory };
+                const apiKey = ""; // The API key will be automatically provided by the Canvas environment
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const aiResponseText = result.candidates[0].content.parts[0].text;
+                    addMessage(aiResponseText, 'ai');
+                    chatHistory.push({ role: "model", parts: [{ text: aiResponseText }] });
+                } else {
+                    addMessage("Desculpe, eu não consegui obter uma resposta da IA.", 'ai');
+                    console.error("Unexpected API response structure:", result);
+                }
+            } catch (error) {
+                console.error("Error communicating with Gemini API:", error);
+                addMessage("Oops! Algo deu errado. Por favor, tente novamente.", 'ai');
+            } finally {
+                showLoading(false); // Hide loading indicator
+                sendButton.disabled = false; // Re-enable send button
+                attachImageButton.disabled = false; // Re-enable attach button
+            }
+        }
+
+        // Function to clear the selected image
+        function clearSelectedImage() {
+            selectedImageBase64 = null;
+            selectedImageMimeType = null;
+            imageInput.value = ''; // Clear file input
+            imagePreviewContainer.classList.remove('active');
+            imagePreview.src = '#';
+        }
+
+        // Event listeners
+        sendButton.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        attachImageButton.addEventListener('click', () => {
+            imageInput.click(); // Trigger the hidden file input click
+        });
+
+        imageInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    selectedImageBase64 = e.target.result.split(',')[1]; // Get base64 string
+                    selectedImageMimeType = file.type;
+
+                    imagePreview.src = e.target.result;
+                    imagePreviewContainer.classList.add('active');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                clearSelectedImage();
+            }
+        });
+
+        clearImageButton.addEventListener('click', clearSelectedImage);
+    </script>
+</body>
+</html>
