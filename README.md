@@ -22,9 +22,9 @@ Para executar este chatbot, siga os passos abaixo:
 
 1. Salve o Código: Copie todo o código HTML fornecido e salve-o em um arquivo com a extensão .html (por exemplo, chatbot.html).
 
-2. Abra no Navegador: Abra o arquivo .html em qualquer navegador web moderno.
+2. Abra no Navegador: Abra o arquivo .html em qualquer navegador web.
 
-3. Interaja:
+4. Interaja:
 
     - Digite sua mensagem na caixa de texto na parte inferior.
 
@@ -50,13 +50,5 @@ Para executar este chatbot, siga os passos abaixo:
 
     - A apiKey para a API Gemini é deixada vazia (const apiKey = "";), pois o ambiente Canvas a fornece automaticamente em tempo de execução.
 
-## Próximos Passos (Sugestões de Melhoria)
-- Integração com Angular: Este código pode ser a base para um componente Angular. Você precisaria migrar o HTML para o template do componente, o JavaScript para o arquivo TypeScript do componente (usando HttpClient para as chamadas API e ngModel para data binding), e gerenciar o estado da aplicação com as ferramentas do Angular.
 
-- Persistência de Dados: Implementar o salvamento do histórico de chat (por exemplo, em um banco de dados como o Firestore) para que as conversas possam ser retomadas.
-
-- Autenticação de Usuários: Adicionar um sistema de autenticação para identificar usuários e gerenciar conversas individuais.
-
-- Melhorias na UI/UX: Adicionar mais animações, feedback visual aprimorado e opções de formatação para as mensagens.
-
-- Tratamento de Erros: Implementar um tratamento de erros mais robusto para as chamadas da API e exibir mensagens mais amigáveis ao usuário em caso de falha.
+      
